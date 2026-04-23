@@ -40,6 +40,8 @@ $script:AllowExit = $false
 $script:NormalWindowSize = New-Object System.Drawing.Size(1480, 960)
 $script:CompactWindowSize = New-Object System.Drawing.Size(980, 800)
 $script:CachedAppIcon = $null
+$script:SingleInstanceMutex = $null
+$script:OwnsSingleInstanceMutex = $false
 
 $script:Theme = @{
     Background = [System.Drawing.Color]::FromArgb(244, 247, 251)
@@ -135,6 +137,37 @@ function Initialize-DeckPadShellIdentity {
     try {
         [void][DeckPadShellInterop]::SetCurrentProcessExplicitAppUserModelID('DeckPad.App')
     } catch {
+    }
+}
+
+function Initialize-SingleInstanceGuard {
+    $createdNew = $false
+    $script:SingleInstanceMutex = New-Object System.Threading.Mutex($true, 'Local\DeckPad.SingleInstance', [ref]$createdNew)
+    $script:OwnsSingleInstanceMutex = [bool]$createdNew
+
+    if (-not $script:OwnsSingleInstanceMutex) {
+        try {
+            $script:SingleInstanceMutex.Dispose()
+        } catch {
+        }
+        exit 0
+    }
+}
+
+function Release-SingleInstanceGuard {
+    if (-not $script:SingleInstanceMutex) {
+        return
+    }
+
+    try {
+        if ($script:OwnsSingleInstanceMutex) {
+            $script:SingleInstanceMutex.ReleaseMutex()
+        }
+    } catch {
+    } finally {
+        $script:SingleInstanceMutex.Dispose()
+        $script:SingleInstanceMutex = $null
+        $script:OwnsSingleInstanceMutex = $false
     }
 }
 
@@ -352,7 +385,7 @@ This software is provided as-is, with no warranty or guarantee of support.
 function Show-SettingsDialog {
     $dialog = New-Object System.Windows.Forms.Form
     $dialog.Text = 'DeckPad Settings'
-    $dialog.Size = New-Object System.Drawing.Size(870, 590)
+    $dialog.ClientSize = New-Object System.Drawing.Size(850, 620)
     $dialog.StartPosition = 'CenterParent'
     $dialog.FormBorderStyle = 'FixedDialog'
     $dialog.MaximizeBox = $false
@@ -362,7 +395,7 @@ function Show-SettingsDialog {
 
     $card = New-Object System.Windows.Forms.Panel
     $card.Location = New-Object System.Drawing.Point(18, 18)
-    $card.Size = New-Object System.Drawing.Size(500, 504)
+    $card.Size = New-Object System.Drawing.Size(500, 560)
     $card.BackColor = $script:Theme.Panel
     $card.BorderStyle = 'FixedSingle'
     [void]$dialog.Controls.Add($card)
@@ -476,15 +509,15 @@ function Show-SettingsDialog {
 
     $note = New-Object System.Windows.Forms.Label
     $note.Text = 'Tip: the tray icon lets DeckPad keep running without taking space on your taskbar.'
-    $note.Location = New-Object System.Drawing.Point(30, 438)
-    $note.Size = New-Object System.Drawing.Size(440, 26)
+    $note.Location = New-Object System.Drawing.Point(30, 452)
+    $note.Size = New-Object System.Drawing.Size(440, 38)
     $note.Font = New-Object System.Drawing.Font('Segoe UI', 9, [System.Drawing.FontStyle]::Italic)
     $note.ForeColor = $script:Theme.Muted
     [void]$card.Controls.Add($note)
 
     $saveButton = New-Object System.Windows.Forms.Button
     $saveButton.Text = 'Save Settings'
-    $saveButton.Location = New-Object System.Drawing.Point(248, 460)
+    $saveButton.Location = New-Object System.Drawing.Point(248, 504)
     $saveButton.Size = New-Object System.Drawing.Size(126, 38)
     [void](Set-ButtonStyle -Button $saveButton -Variant 'primary')
     $saveButton.Add_Click({
@@ -506,7 +539,7 @@ function Show-SettingsDialog {
 
     $cancelButton = New-Object System.Windows.Forms.Button
     $cancelButton.Text = 'Cancel'
-    $cancelButton.Location = New-Object System.Drawing.Point(384, 460)
+    $cancelButton.Location = New-Object System.Drawing.Point(384, 504)
     $cancelButton.Size = New-Object System.Drawing.Size(86, 38)
     [void](Set-ButtonStyle -Button $cancelButton -Variant 'secondary')
     $cancelButton.Add_Click({ $dialog.Close() })
@@ -514,7 +547,7 @@ function Show-SettingsDialog {
 
     $creatorCard = New-Object System.Windows.Forms.Panel
     $creatorCard.Location = New-Object System.Drawing.Point(534, 18)
-    $creatorCard.Size = New-Object System.Drawing.Size(292, 504)
+    $creatorCard.Size = New-Object System.Drawing.Size(292, 560)
     $creatorCard.BackColor = $script:Theme.Panel
     $creatorCard.BorderStyle = 'FixedSingle'
     [void]$dialog.Controls.Add($creatorCard)
@@ -527,9 +560,20 @@ function Show-SettingsDialog {
     $creatorTitle.ForeColor = $script:Theme.Ink
     [void]$creatorCard.Controls.Add($creatorTitle)
 
+    $logoPath = Join-Path $script:AppRoot 'assets\Rouge.jpg'
+    if (Test-Path -LiteralPath $logoPath) {
+        $logoBox = New-Object System.Windows.Forms.PictureBox
+        $logoBox.Location = New-Object System.Drawing.Point(24, 72)
+        $logoBox.Size = New-Object System.Drawing.Size(96, 96)
+        $logoBox.SizeMode = 'Zoom'
+        $logoBox.BackColor = $script:Theme.Canvas
+        $logoBox.ImageLocation = $logoPath
+        [void]$creatorCard.Controls.Add($logoBox)
+    }
+
     $creatorNote = New-Object System.Windows.Forms.Label
     $creatorNote.Text = 'DeckPad is a local-first desktop companion for small 6-key macro pads with one knob.'
-    $creatorNote.Location = New-Object System.Drawing.Point(24, 84)
+    $creatorNote.Location = New-Object System.Drawing.Point(24, 184)
     $creatorNote.Size = New-Object System.Drawing.Size(238, 64)
     $creatorNote.Font = New-Object System.Drawing.Font('Segoe UI', 9.5, [System.Drawing.FontStyle]::Italic)
     $creatorNote.ForeColor = $script:Theme.Muted
@@ -537,7 +581,7 @@ function Show-SettingsDialog {
 
     $privacyTitle = New-Object System.Windows.Forms.Label
     $privacyTitle.Text = 'Privacy Reminder'
-    $privacyTitle.Location = New-Object System.Drawing.Point(24, 184)
+    $privacyTitle.Location = New-Object System.Drawing.Point(24, 274)
     $privacyTitle.AutoSize = $true
     $privacyTitle.Font = New-Object System.Drawing.Font('Segoe UI Semibold', 13, [System.Drawing.FontStyle]::Bold)
     $privacyTitle.ForeColor = $script:Theme.Accent
@@ -545,15 +589,15 @@ function Show-SettingsDialog {
 
     $privacyBody = New-Object System.Windows.Forms.Label
     $privacyBody.Text = "Profiles and settings stay on your machine.`r`nReview any runtime JSON before sharing it publicly.`r`nThe repo keeps only sample config files."
-    $privacyBody.Location = New-Object System.Drawing.Point(24, 218)
-    $privacyBody.Size = New-Object System.Drawing.Size(238, 78)
+    $privacyBody.Location = New-Object System.Drawing.Point(24, 308)
+    $privacyBody.Size = New-Object System.Drawing.Size(238, 90)
     $privacyBody.Font = New-Object System.Drawing.Font('Segoe UI', 9.5, [System.Drawing.FontStyle]::Regular)
     $privacyBody.ForeColor = $script:Theme.Ink
     [void]$creatorCard.Controls.Add($privacyBody)
 
     $termsLink = New-Object System.Windows.Forms.LinkLabel
     $termsLink.Text = 'License and Terms of Service'
-    $termsLink.Location = New-Object System.Drawing.Point(24, 440)
+    $termsLink.Location = New-Object System.Drawing.Point(24, 508)
     $termsLink.Size = New-Object System.Drawing.Size(238, 28)
     $termsLink.Font = New-Object System.Drawing.Font('Segoe UI Semibold', 10, [System.Drawing.FontStyle]::Bold)
     $termsLink.LinkColor = $script:Theme.Accent
@@ -3122,6 +3166,7 @@ function Rebuild-DeckPadShell {
 $script:Settings = Load-Settings
 Apply-AppSettings
 Initialize-DeckPadShellIdentity
+Initialize-SingleInstanceGuard
 
 if ($script:Settings.startupProfilePath) {
     $script:ProfilePath = Join-Path $script:AppRoot ([string]$script:Settings.startupProfilePath)
@@ -3998,6 +4043,7 @@ $form.Add_FormClosing({
         $script:NotifyIcon.Visible = $false
         $script:NotifyIcon.Dispose()
     }
+    Release-SingleInstanceGuard
 })
 
 [void][System.Windows.Forms.Application]::Run($form)
