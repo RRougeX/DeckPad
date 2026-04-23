@@ -426,30 +426,30 @@ function Show-SettingsDialog {
     [void]$card.Controls.Add($closeToTrayCheck)
 
     $trayDefaultNote = New-Object System.Windows.Forms.Label
-    $trayDefaultNote.Text = 'This is enabled by default on first launch so your mappings can keep working after the window is closed.'
+    $trayDefaultNote.Text = 'Enabled by default so mappings keep working after the window is closed.'
     $trayDefaultNote.Location = New-Object System.Drawing.Point(48, 292)
-    $trayDefaultNote.Size = New-Object System.Drawing.Size(408, 34)
+    $trayDefaultNote.Size = New-Object System.Drawing.Size(408, 20)
     $trayDefaultNote.Font = New-Object System.Drawing.Font('Segoe UI', 8.7, [System.Drawing.FontStyle]::Italic)
     $trayDefaultNote.ForeColor = $script:Theme.Muted
     [void]$card.Controls.Add($trayDefaultNote)
 
     $profileSectionLabel = New-Object System.Windows.Forms.Label
     $profileSectionLabel.Text = 'Profile on Startup'
-    $profileSectionLabel.Location = New-Object System.Drawing.Point(30, 332)
+    $profileSectionLabel.Location = New-Object System.Drawing.Point(30, 318)
     $profileSectionLabel.AutoSize = $true
     $profileSectionLabel.Font = New-Object System.Drawing.Font('Segoe UI Semibold', 10.5, [System.Drawing.FontStyle]::Bold)
     $profileSectionLabel.ForeColor = $script:Theme.Accent
     [void]$card.Controls.Add($profileSectionLabel)
 
-    $resumeCheck = New-SettingsCheckbox -Text 'Resume listening automatically on startup' -Y 358 -Checked ([bool]$script:Settings.resumeListeningOnStartup)
+    $resumeCheck = New-SettingsCheckbox -Text 'Resume listening automatically on startup' -Y 344 -Checked ([bool]$script:Settings.resumeListeningOnStartup)
     [void]$card.Controls.Add($resumeCheck)
 
-    $profileCheck = New-SettingsCheckbox -Text 'Load saved profile on startup' -Y 392 -Checked ([bool]$script:Settings.loadDefaultProfileOnStartup)
+    $profileCheck = New-SettingsCheckbox -Text 'Load saved profile on startup' -Y 376 -Checked ([bool]$script:Settings.loadDefaultProfileOnStartup)
     [void]$card.Controls.Add($profileCheck)
 
     $profileChoiceLabel = New-Object System.Windows.Forms.Label
     $profileChoiceLabel.Text = 'Startup profile'
-    $profileChoiceLabel.Location = New-Object System.Drawing.Point(54, 426)
+    $profileChoiceLabel.Location = New-Object System.Drawing.Point(54, 410)
     $profileChoiceLabel.AutoSize = $true
     $profileChoiceLabel.Font = New-Object System.Drawing.Font('Segoe UI', 9.5, [System.Drawing.FontStyle]::Bold)
     $profileChoiceLabel.ForeColor = $script:Theme.Muted
@@ -457,7 +457,7 @@ function Show-SettingsDialog {
 
     $profileChoices = @(Get-ProfileStartupChoices)
     $profileChoiceBox = New-Object System.Windows.Forms.ComboBox
-    $profileChoiceBox.Location = New-Object System.Drawing.Point(170, 422)
+    $profileChoiceBox.Location = New-Object System.Drawing.Point(170, 406)
     $profileChoiceBox.Size = New-Object System.Drawing.Size(286, 30)
     $profileChoiceBox.DropDownStyle = 'DropDownList'
     [void](Set-InputStyle -Control $profileChoiceBox)
@@ -476,15 +476,15 @@ function Show-SettingsDialog {
 
     $note = New-Object System.Windows.Forms.Label
     $note.Text = 'Tip: the tray icon lets DeckPad keep running without taking space on your taskbar.'
-    $note.Location = New-Object System.Drawing.Point(30, 464)
-    $note.Size = New-Object System.Drawing.Size(440, 32)
+    $note.Location = New-Object System.Drawing.Point(30, 438)
+    $note.Size = New-Object System.Drawing.Size(440, 26)
     $note.Font = New-Object System.Drawing.Font('Segoe UI', 9, [System.Drawing.FontStyle]::Italic)
     $note.ForeColor = $script:Theme.Muted
     [void]$card.Controls.Add($note)
 
     $saveButton = New-Object System.Windows.Forms.Button
     $saveButton.Text = 'Save Settings'
-    $saveButton.Location = New-Object System.Drawing.Point(248, 486)
+    $saveButton.Location = New-Object System.Drawing.Point(248, 460)
     $saveButton.Size = New-Object System.Drawing.Size(126, 38)
     [void](Set-ButtonStyle -Button $saveButton -Variant 'primary')
     $saveButton.Add_Click({
@@ -506,7 +506,7 @@ function Show-SettingsDialog {
 
     $cancelButton = New-Object System.Windows.Forms.Button
     $cancelButton.Text = 'Cancel'
-    $cancelButton.Location = New-Object System.Drawing.Point(384, 486)
+    $cancelButton.Location = New-Object System.Drawing.Point(384, 460)
     $cancelButton.Size = New-Object System.Drawing.Size(86, 38)
     [void](Set-ButtonStyle -Button $cancelButton -Variant 'secondary')
     $cancelButton.Add_Click({ $dialog.Close() })
