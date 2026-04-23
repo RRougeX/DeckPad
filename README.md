@@ -1,4 +1,5 @@
 # DeckPad
+<img width="586" height="247" alt="image" src="https://github.com/user-attachments/assets/978397ca-839e-4ae8-a4ae-b6813370c6eb" />
 
 DeckPad is a Windows companion app for small USB macro pads, especially the
 common 6-key + 1-knob boards. It listens for the keys your pad already sends and
