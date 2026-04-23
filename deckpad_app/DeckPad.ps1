@@ -446,26 +446,23 @@ function Show-SettingsDialog {
     $startupCheck = New-SettingsCheckbox -Text 'Launch DeckPad in the tray when Windows starts' -Y 132 -Checked ([bool]$script:Settings.launchOnWindowsStartup)
     [void]$card.Controls.Add($startupCheck)
 
-    $startMinimizedCheck = New-SettingsCheckbox -Text 'Start minimized to tray on normal launch' -Y 166 -Checked ([bool]$script:Settings.startMinimizedToTray)
-    [void]$card.Controls.Add($startMinimizedCheck)
-
     $traySectionLabel = New-Object System.Windows.Forms.Label
     $traySectionLabel.Text = 'Tray Behavior'
-    $traySectionLabel.Location = New-Object System.Drawing.Point(30, 206)
+    $traySectionLabel.Location = New-Object System.Drawing.Point(30, 176)
     $traySectionLabel.AutoSize = $true
     $traySectionLabel.Font = New-Object System.Drawing.Font('Segoe UI Semibold', 10.5, [System.Drawing.FontStyle]::Bold)
     $traySectionLabel.ForeColor = $script:Theme.Accent
     [void]$card.Controls.Add($traySectionLabel)
 
-    $minimizeToTrayCheck = New-SettingsCheckbox -Text 'Minimize button sends DeckPad to the tray' -Y 232 -Checked ([bool]$script:Settings.minimizeToTray)
+    $minimizeToTrayCheck = New-SettingsCheckbox -Text 'Minimize button sends DeckPad to the tray' -Y 202 -Checked ([bool]$script:Settings.minimizeToTray)
     [void]$card.Controls.Add($minimizeToTrayCheck)
 
-    $closeToTrayCheck = New-SettingsCheckbox -Text 'Clicking X keeps DeckPad running in the tray' -Y 266 -Checked ([bool]$script:Settings.closeToTray)
+    $closeToTrayCheck = New-SettingsCheckbox -Text 'Clicking X keeps DeckPad running in the tray' -Y 236 -Checked ([bool]$script:Settings.closeToTray)
     [void]$card.Controls.Add($closeToTrayCheck)
 
     $trayDefaultNote = New-Object System.Windows.Forms.Label
     $trayDefaultNote.Text = 'Enabled by default so mappings keep working after the window is closed.'
-    $trayDefaultNote.Location = New-Object System.Drawing.Point(48, 292)
+    $trayDefaultNote.Location = New-Object System.Drawing.Point(48, 262)
     $trayDefaultNote.Size = New-Object System.Drawing.Size(408, 20)
     $trayDefaultNote.Font = New-Object System.Drawing.Font('Segoe UI', 8.7, [System.Drawing.FontStyle]::Italic)
     $trayDefaultNote.ForeColor = $script:Theme.Muted
@@ -473,21 +470,21 @@ function Show-SettingsDialog {
 
     $profileSectionLabel = New-Object System.Windows.Forms.Label
     $profileSectionLabel.Text = 'Profile on Startup'
-    $profileSectionLabel.Location = New-Object System.Drawing.Point(30, 318)
+    $profileSectionLabel.Location = New-Object System.Drawing.Point(30, 298)
     $profileSectionLabel.AutoSize = $true
     $profileSectionLabel.Font = New-Object System.Drawing.Font('Segoe UI Semibold', 10.5, [System.Drawing.FontStyle]::Bold)
     $profileSectionLabel.ForeColor = $script:Theme.Accent
     [void]$card.Controls.Add($profileSectionLabel)
 
-    $resumeCheck = New-SettingsCheckbox -Text 'Resume listening automatically on startup' -Y 344 -Checked ([bool]$script:Settings.resumeListeningOnStartup)
+    $resumeCheck = New-SettingsCheckbox -Text 'Resume listening automatically on startup' -Y 324 -Checked ([bool]$script:Settings.resumeListeningOnStartup)
     [void]$card.Controls.Add($resumeCheck)
 
-    $profileCheck = New-SettingsCheckbox -Text 'Load saved profile on startup' -Y 376 -Checked ([bool]$script:Settings.loadDefaultProfileOnStartup)
+    $profileCheck = New-SettingsCheckbox -Text 'Load saved profile on startup' -Y 356 -Checked ([bool]$script:Settings.loadDefaultProfileOnStartup)
     [void]$card.Controls.Add($profileCheck)
 
     $profileChoiceLabel = New-Object System.Windows.Forms.Label
     $profileChoiceLabel.Text = 'Startup profile'
-    $profileChoiceLabel.Location = New-Object System.Drawing.Point(54, 410)
+    $profileChoiceLabel.Location = New-Object System.Drawing.Point(54, 390)
     $profileChoiceLabel.AutoSize = $true
     $profileChoiceLabel.Font = New-Object System.Drawing.Font('Segoe UI', 9.5, [System.Drawing.FontStyle]::Bold)
     $profileChoiceLabel.ForeColor = $script:Theme.Muted
@@ -495,7 +492,7 @@ function Show-SettingsDialog {
 
     $profileChoices = @(Get-ProfileStartupChoices)
     $profileChoiceBox = New-Object System.Windows.Forms.ComboBox
-    $profileChoiceBox.Location = New-Object System.Drawing.Point(170, 406)
+    $profileChoiceBox.Location = New-Object System.Drawing.Point(170, 386)
     $profileChoiceBox.Size = New-Object System.Drawing.Size(286, 30)
     $profileChoiceBox.DropDownStyle = 'DropDownList'
     [void](Set-InputStyle -Control $profileChoiceBox)
@@ -514,7 +511,7 @@ function Show-SettingsDialog {
 
     $note = New-Object System.Windows.Forms.Label
     $note.Text = 'Tip: the tray icon lets DeckPad keep running without taking space on your taskbar.'
-    $note.Location = New-Object System.Drawing.Point(30, 452)
+    $note.Location = New-Object System.Drawing.Point(30, 432)
     $note.Size = New-Object System.Drawing.Size(440, 38)
     $note.Font = New-Object System.Drawing.Font('Segoe UI', 9, [System.Drawing.FontStyle]::Italic)
     $note.ForeColor = $script:Theme.Muted
@@ -527,7 +524,6 @@ function Show-SettingsDialog {
     [void](Set-ButtonStyle -Button $saveButton -Variant 'primary')
     $saveButton.Add_Click({
         $script:Settings.launchOnWindowsStartup = [bool]$startupCheck.Checked
-        $script:Settings.startMinimizedToTray = [bool]$startMinimizedCheck.Checked
         $script:Settings.minimizeToTray = [bool]$minimizeToTrayCheck.Checked
         $script:Settings.closeToTray = [bool]$closeToTrayCheck.Checked
         $script:Settings.resumeListeningOnStartup = [bool]$resumeCheck.Checked
@@ -4022,10 +4018,7 @@ $form.Add_SizeChanged({
 
 $form.Add_Shown({
     Apply-StableLayout
-    if (
-        $script:StartInTray -or
-        ($script:Settings -and [bool]$script:Settings.startMinimizedToTray)
-    ) {
+    if ($script:StartInTray) {
         Hide-DeckPadToTray
     }
 })
