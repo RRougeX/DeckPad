@@ -1,0 +1,12 @@
+macropad_tool/target/
+
+# DeckPad local runtime state
+deckpad_app/settings/app-settings.json
+deckpad_app/profiles/*.json
+!deckpad_app/settings/app-settings.sample.json
+!deckpad_app/profiles/default-profile.sample.json
+
+# Windows noise
+Thumbs.db
+Desktop.ini
+*.lnk

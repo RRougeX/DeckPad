@@ -1,0 +1,98 @@
+{
+  "name": "6-Key Stream Deck",
+  "deviceLayout": "6-keys-1-knob",
+  "targetDeviceId": null,
+  "targetDeviceName": "Not locked",
+  "bindings": [
+    {
+      "slotId": "key1",
+      "displayName": "Top Left",
+      "label": "Discord",
+      "keyName": "",
+      "vkCode": 0,
+      "triggerSignature": "",
+      "actionType": "focus_or_launch",
+      "value": "discord|discord"
+    },
+    {
+      "slotId": "key2",
+      "displayName": "Top Middle",
+      "label": "Spotify",
+      "keyName": "",
+      "vkCode": 0,
+      "triggerSignature": "",
+      "actionType": "focus_or_launch",
+      "value": "spotify|spotify"
+    },
+    {
+      "slotId": "key3",
+      "displayName": "Top Right",
+      "label": "Browser",
+      "keyName": "",
+      "vkCode": 0,
+      "triggerSignature": "",
+      "actionType": "open_url",
+      "value": "https://www.twitch.tv"
+    },
+    {
+      "slotId": "key4",
+      "displayName": "Bottom Left",
+      "label": "Scene 1",
+      "keyName": "",
+      "vkCode": 0,
+      "triggerSignature": "",
+      "actionType": "send_hotkey",
+      "value": "^+1"
+    },
+    {
+      "slotId": "key5",
+      "displayName": "Bottom Middle",
+      "label": "Notes",
+      "keyName": "",
+      "vkCode": 0,
+      "triggerSignature": "",
+      "actionType": "launch_app",
+      "value": "notepad.exe"
+    },
+    {
+      "slotId": "key6",
+      "displayName": "Bottom Right",
+      "label": "Files",
+      "keyName": "",
+      "vkCode": 0,
+      "triggerSignature": "",
+      "actionType": "launch_app",
+      "value": "explorer.exe"
+    },
+    {
+      "slotId": "knob_left",
+      "displayName": "Knob Left",
+      "label": "Spotify Volume Down",
+      "keyName": "",
+      "vkCode": 0,
+      "triggerSignature": "",
+      "actionType": "spotify_volume_down",
+      "value": ""
+    },
+    {
+      "slotId": "knob_press",
+      "displayName": "Knob Press",
+      "label": "Spotify Play/Pause",
+      "keyName": "",
+      "vkCode": 0,
+      "triggerSignature": "",
+      "actionType": "spotify_play_pause",
+      "value": ""
+    },
+    {
+      "slotId": "knob_right",
+      "displayName": "Knob Right",
+      "label": "Spotify Volume Up",
+      "keyName": "",
+      "vkCode": 0,
+      "triggerSignature": "",
+      "actionType": "spotify_volume_up",
+      "value": ""
+    }
+  ]
+}

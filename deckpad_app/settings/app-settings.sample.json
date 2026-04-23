@@ -1,0 +1,9 @@
+{
+  "launchOnWindowsStartup": false,
+  "startMinimizedToTray": false,
+  "minimizeToTray": true,
+  "closeToTray": true,
+  "resumeListeningOnStartup": true,
+  "loadDefaultProfileOnStartup": true,
+  "startupProfilePath": "profiles\\default-profile.json"
+}
