@@ -1,114 +1,102 @@
 # DeckPad
 
-DeckPad is a Windows desktop companion app for small macro keyboards with
-6 keys and 1 knob. It listens to the keys your mini pad already sends and maps
-them to app launches, window focus, hotkeys, URLs, text, commands, and Spotify
-controls.
+DeckPad is a Windows companion app for small USB macro pads, especially the
+common 6-key + 1-knob boards. It listens for the keys your pad already sends and
+turns them into useful desktop actions like launching apps, focusing windows,
+opening URLs, sending hotkeys, typing text, running commands, and controlling
+Spotify.
 
-DeckPad is designed for boards like the common 6-key + knob USB macro pads. It
-does not require vendor software to run, but vendor software can still be useful
-if you want to remap the pad to unique trigger keys such as `F13` through `F21`.
-
-## Why There Are Two README Files
-
-This repo keeps two `README.md` files on purpose:
-
-- The root [`README.md`](./README.md) is the GitHub landing page. It explains what the project is, how to start, and what is safe to publish.
-- [`deckpad_app/README.md`](./deckpad_app/README.md) is the folder-level guide for the actual app files. It is there so someone who opens `deckpad_app` directly still sees run instructions and file notes right away.
-
-If this repo is viewed on GitHub, the root README should answer "what is this project?".
-If someone is already inside `deckpad_app`, the app README should answer "what do I run and what files matter here?".
-
-## Repo Layout
-
-```text
-RaffSteamDeck/
-  README.md                  <- repo overview
-  HOW_TO_USE.md              <- step-by-step usage guide
-  PUBLISH_CHECKLIST.md       <- pre-GitHub review checklist
-  deckpad_app/
-    README.md                <- app-folder guide
-    DeckPad.ps1              <- main app
-    Run-DeckPad.bat          <- easiest launcher
-    profiles/                <- local runtime profiles
-    settings/                <- local runtime settings
-```
+DeckPad does not require vendor software to run. Vendor software is only useful
+if you want to remap the pad to uncommon trigger keys such as `F13` through
+`F21`, which helps avoid conflicts with your normal keyboard.
 
 ## Features
 
-- 6-key + 1-knob control surface
-- Device-aware input lock so your normal keyboard does not trigger actions
+- Fixed 6-key + 1-knob control surface
+- Device lock so your normal keyboard does not trigger actions
+- Raw trigger capture using virtual keys, scan codes, modifier chords, and HID data when available
 - Per-slot action editor
 - Profile creation and startup profile selection
-- Desktop shortcut installer
-- Tray support, including minimize-to-tray and close-to-tray settings
-- Custom app/tray/shortcut icon
-- Raw trigger capture using key codes, scan codes, modifier chords, and HID media controls when available
-- Spotify actions for volume, play/pause, next track, and previous track
+- Minimize-to-tray and close-to-tray behavior
+- Desktop and Start menu shortcut installer
+- Custom icon support
+- Spotify volume, play/pause, previous track, and next track actions
 
 ## Requirements
 
 - Windows
 - PowerShell 5.1 or newer
-- A small HID macro keyboard, ideally 6 keys + 1 knob
+- A small HID keyboard-style macro pad
 
 ## Quick Start
 
 1. Download or clone this repo.
 2. Open `deckpad_app`.
 3. Run `Run-DeckPad.bat`.
-4. Select your mini pad in the device dropdown and click `Use Selected`.
-5. If you are unsure which device is the mini pad, click `Lock Device`, then press a key on the mini pad.
-6. Click a tile, click `Capture Key`, press the physical button, choose an action, and click `Save Slot`.
+4. Select your mini pad from the device dropdown and click `Use Selected`.
+5. If you are not sure which device is the mini pad, click `Lock To Device`, then press one key on the pad.
+6. Click a tile, click `Capture Key`, press the physical key or knob action, choose an action, and click `Save Slot`.
 
-If you want the folder-specific launcher notes and file map, open
-[`deckpad_app/README.md`](./deckpad_app/README.md).
-
-To create a desktop shortcut, run:
+To create desktop and Start menu shortcuts, run:
 
 ```text
 deckpad_app\Install-Desktop-Shortcut.bat
 ```
 
-## Profiles
+## How It Runs
 
-Runtime profiles are stored in:
+DeckPad is a local PowerShell WinForms app. When you click the window `X`, it is
+designed to stay running in the system tray so your mappings still work. To fully
+quit, use the tray icon menu and choose `Exit DeckPad`.
+
+## Repo Layout
 
 ```text
-deckpad_app\profiles
+DeckPad/
+  README.md
+  HOW_TO_USE.md
+  PUBLISH_CHECKLIST.md
+  deckpad_app/
+    DeckPad.ps1
+    Run-DeckPad.bat
+    Install-Desktop-Shortcut.bat
+    assets/
+    lib/
+    profiles/
+    settings/
 ```
 
-The repo ships a public-safe sample profile at:
+## Personal Profiles And Git Safety
+
+The repo ships public-safe sample files:
 
 ```text
 deckpad_app\profiles\default-profile.sample.json
+deckpad_app\settings\app-settings.sample.json
 ```
 
-On first run, DeckPad creates the live `default-profile.json` locally. That live
-profile is ignored by git so device locks, custom commands, private paths, and
-personal URLs do not get staged by accident.
+When you run DeckPad, it creates local runtime files:
 
-Inside the app, click `Create Profile` to copy your current mappings and actions
-into a new profile JSON file. The new profile is automatically selected as the
-startup profile.
+```text
+deckpad_app\profiles\default-profile.json
+deckpad_app\settings\app-settings.json
+```
 
-Startup profile behavior is controlled in `Settings`:
+Those runtime files are ignored by git. That means you can lock DeckPad to your
+own device, save private app paths, commands, URLs, and custom profiles without
+uploading that personal setup to GitHub.
 
-- `Load saved profile on startup`
-- `Startup profile`
+If you update the app later, use:
 
-If a selected startup profile is deleted, DeckPad falls back to
-`profiles\default-profile.json`.
+```powershell
+git pull
+```
 
-## Included Docs
-
-- [`HOW_TO_USE.md`](./HOW_TO_USE.md) for a straightforward usage walkthrough
-- [`PUBLISH_CHECKLIST.md`](./PUBLISH_CHECKLIST.md) for the final public-repo sanity check
-- [`deckpad_app/README.md`](./deckpad_app/README.md) for the app-folder guide
+Your ignored local profile and settings files should stay on your machine.
 
 ## Recommended Trigger Keys
 
-For best results, program your mini pad to send keys that your normal keyboard
+For best results, configure the macro pad to send keys that your normal keyboard
 does not use:
 
 ```text
@@ -123,9 +111,9 @@ Knob Press     F20 or media play/pause
 Knob Right     F21 or media next
 ```
 
-If two physical switches send the exact same low-level input, Windows cannot tell
-them apart. DeckPad stores raw trigger signatures when possible, but identical
-hardware input must be fixed by remapping the pad itself.
+If two physical controls send the exact same low-level input, Windows cannot
+tell them apart. DeckPad can store raw trigger signatures when possible, but
+identical hardware input has to be fixed by remapping the pad itself.
 
 ## Action Types
 
@@ -141,20 +129,11 @@ hardware input must be fixed by remapping the pad itself.
 - `spotify_previous_track`: send a background previous-track key
 - `spotify_next_track`: send a background next-track key
 
-## Privacy And Public Repo Safety
+## Docs
 
-The repo is prepared for public release:
-
-- No local Windows user paths are included in the tracked sample profile.
-- No API keys, tokens, webhooks, or credentials are included.
-- Runtime profile and settings files are ignored from git.
-- User-created profiles may contain private paths, URLs, commands, or device IDs, so review them before force-adding anything from `deckpad_app\profiles` or `deckpad_app\settings`.
-
-Before publishing your own customized copy, run:
-
-```powershell
-rg -n "C:\\|Users\\|Desktop|AppData|token|secret|password|api[_-]?key|webhook" .
-```
+- [`HOW_TO_USE.md`](./HOW_TO_USE.md) is the step-by-step user guide.
+- [`deckpad_app/README.md`](./deckpad_app/README.md) explains the runnable app folder.
+- [`PUBLISH_CHECKLIST.md`](./PUBLISH_CHECKLIST.md) is a final safety checklist before publishing changes.
 
 ## License
 

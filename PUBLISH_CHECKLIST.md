@@ -1,45 +1,56 @@
 # Publish Checklist
 
-Use this before pushing the repo to GitHub.
+Use this before committing or pushing public changes.
 
 ## Safe By Default
 
-This repo has already been cleaned up to avoid obvious personal data leaks:
+The repo is designed so personal runtime state stays local:
 
-- no local `C:\Users\...` paths in docs
-- no build output
-- generic sample profile
-- live profile and settings files ignored by git
+- `deckpad_app/profiles/*.json` is ignored.
+- `deckpad_app/settings/app-settings.json` is ignored.
+- `default-profile.sample.json` and `app-settings.sample.json` are the public files.
 
-## Quick Manual Review
+## Before Committing
 
-Check these before publishing:
+Run:
 
-1. Open [`deckpad_app/profiles/default-profile.sample.json`](./deckpad_app/profiles/default-profile.sample.json).
-2. Make sure it does not include:
-   - private file paths
-   - private URLs
-   - personal names
-   - app commands you do not want public
-3. If you plan to force-add a live file from `deckpad_app/profiles` or `deckpad_app/settings`, review it line by line first.
-4. Open [`deckpad_app/DeckPad.ps1`](./deckpad_app/DeckPad.ps1) if you customized it.
-5. Make sure you did not hardcode:
-   - usernames
-   - API keys
-   - tokens
-   - Discord webhooks
-   - OBS secrets
+```powershell
+git status --short
+```
 
-## Suggested Repo Name
+Only commit files you intentionally changed. Do not force-add local runtime
+profiles or settings unless you reviewed them line by line.
 
-Pick a neutral GitHub repo name, for example:
+## Secret Scan
 
-- `deckpad`
-- `deckpad-windows`
-- `deckpad-controller`
+Before publishing, run:
 
-## Nice-To-Have GitHub Setup
+```powershell
+rg -n -i "C:\\|Users\\|Desktop|AppData|token|secret|password|api[_-]?key|webhook|client[_-]?secret|private[_-]?key" .
+```
 
-- add a repo description
-- add topics like `powershell`, `windows`, `macro-pad`, `stream-deck`
-- use the included source-available `LICENSE`
+Expected harmless matches may include documentation that mentions these words.
+Review any match that points to real code, profiles, settings, or commands.
+
+## Manual Review
+
+Check:
+
+- `deckpad_app/profiles/default-profile.sample.json`
+- `deckpad_app/settings/app-settings.sample.json`
+- `README.md`
+- `HOW_TO_USE.md`
+- `deckpad_app/README.md`
+
+Make sure they do not include private paths, device identifiers, tokens,
+webhooks, personal URLs, or commands you do not want public.
+
+## GitHub Setup
+
+Suggested topics:
+
+- `powershell`
+- `windows`
+- `macro-pad`
+- `stream-deck`
+- `tray-app`
