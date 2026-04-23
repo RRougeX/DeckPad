@@ -1,3 +1,7 @@
+param(
+    [switch]$StartInTray
+)
+
 $libRoot = Join-Path $PSScriptRoot 'lib'
 . (Join-Path $libRoot 'NativeInterop.ps1')
 . (Join-Path $libRoot 'ProfileEngine.ps1')
@@ -42,6 +46,7 @@ $script:CompactWindowSize = New-Object System.Drawing.Size(980, 800)
 $script:CachedAppIcon = $null
 $script:SingleInstanceMutex = $null
 $script:OwnsSingleInstanceMutex = $false
+$script:StartInTray = [bool]$StartInTray
 
 $script:Theme = @{
     Background = [System.Drawing.Color]::FromArgb(244, 247, 251)
@@ -438,10 +443,10 @@ function Show-SettingsDialog {
     $appSectionLabel.ForeColor = $script:Theme.Accent
     [void]$card.Controls.Add($appSectionLabel)
 
-    $startupCheck = New-SettingsCheckbox -Text 'Launch DeckPad when Windows starts' -Y 132 -Checked ([bool]$script:Settings.launchOnWindowsStartup)
+    $startupCheck = New-SettingsCheckbox -Text 'Launch DeckPad in the tray when Windows starts' -Y 132 -Checked ([bool]$script:Settings.launchOnWindowsStartup)
     [void]$card.Controls.Add($startupCheck)
 
-    $startMinimizedCheck = New-SettingsCheckbox -Text 'Start minimized to tray' -Y 166 -Checked ([bool]$script:Settings.startMinimizedToTray)
+    $startMinimizedCheck = New-SettingsCheckbox -Text 'Start minimized to tray on normal launch' -Y 166 -Checked ([bool]$script:Settings.startMinimizedToTray)
     [void]$card.Controls.Add($startMinimizedCheck)
 
     $traySectionLabel = New-Object System.Windows.Forms.Label
@@ -4017,7 +4022,10 @@ $form.Add_SizeChanged({
 
 $form.Add_Shown({
     Apply-StableLayout
-    if ($script:Settings -and [bool]$script:Settings.startMinimizedToTray) {
+    if (
+        $script:StartInTray -or
+        ($script:Settings -and [bool]$script:Settings.startMinimizedToTray)
+    ) {
         Hide-DeckPadToTray
     }
 })

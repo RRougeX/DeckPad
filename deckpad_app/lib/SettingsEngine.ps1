@@ -66,6 +66,7 @@ function Set-DeckPadStartupShortcut {
         $wshShell = New-Object -ComObject WScript.Shell
         $shortcut = $wshShell.CreateShortcut($shortcutPath)
         $shortcut.TargetPath = $targetPath
+        $shortcut.Arguments = '-StartInTray'
         $shortcut.WorkingDirectory = $script:AppRoot
         $shortcut.WindowStyle = 7
         $shortcut.Description = 'Launch DeckPad at sign in'
